@@ -25,3 +25,7 @@ path = "day2/dive_position/main.rs"
 [[bin]]
 name = "dive_aim"
 path = "day2/dive_aim/main.rs"
+
+[[bin]]
+name = "power_consumption"
+path = "day3/power_consumption/main.rs"
