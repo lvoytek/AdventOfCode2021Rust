@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "2.0.0"
+version = "2.1.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -17,3 +17,7 @@ path = "day1/sonar_sweep/main.rs"
 [[bin]]
 name = "sonar_window"
 path = "day1/sonar_window/main.rs"
+
+[[bin]]
+name = "dive_position"
+path = "day2/dive_position/main.rs"
