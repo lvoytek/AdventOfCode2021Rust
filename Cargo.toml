@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "1.0.0"
+version = "2.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -13,3 +13,7 @@ edition = "2021"
 [[bin]]
 name = "sonar_sweep"
 path = "day1/sonar_sweep/main.rs"
+
+[[bin]]
+name = "sonar_window"
+path = "day1/sonar_window/main.rs"
