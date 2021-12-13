@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "3.0.0"
+version = "3.1.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -29,3 +29,7 @@ path = "day2/dive_aim/main.rs"
 [[bin]]
 name = "power_consumption"
 path = "day3/power_consumption/main.rs"
+
+[[bin]]
+name = "life_support"
+path = "day3/life_support/main.rs"
