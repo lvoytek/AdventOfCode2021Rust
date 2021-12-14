@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "4.1.0"
+version = "5.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -41,3 +41,7 @@ path = "day4/squid_bingo/main.rs"
 [[bin]]
 name = "squid_bingo_loss"
 path = "day4/squid_bingo_loss/main.rs"
+
+[[bin]]
+name = "hydrothermal_line_overlap"
+path = "day5/hydrothermal_line_overlap/main.rs"
