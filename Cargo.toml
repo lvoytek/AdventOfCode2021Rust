@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "3.1.0"
+version = "4.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -33,3 +33,7 @@ path = "day3/power_consumption/main.rs"
 [[bin]]
 name = "life_support"
 path = "day3/life_support/main.rs"
+
+[[bin]]
+name = "squid_bingo"
+path = "day4/squid_bingo/main.rs"
