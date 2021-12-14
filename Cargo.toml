@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "6.0.0"
+version = "6.1.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -53,3 +53,7 @@ path = "day5/hydrothermal_diag_overlap/main.rs"
 [[bin]]
 name = "lanternfish_growth"
 path = "day6/lanternfish_growth/main.rs"
+
+[[bin]]
+name = "lanternfish_big_growth"
+path = "day6/lanternfish_big_growth/main.rs"
