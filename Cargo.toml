@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "6.1.0"
+version = "7.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -57,3 +57,7 @@ path = "day6/lanternfish_growth/main.rs"
 [[bin]]
 name = "lanternfish_big_growth"
 path = "day6/lanternfish_big_growth/main.rs"
+
+[[bin]]
+name = "crab_fuel_position"
+path = "day7/crab_fuel_position/main.rs"
