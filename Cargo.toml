@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "7.1.0"
+version = "8.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -65,3 +65,7 @@ path = "day7/crab_fuel_position/main.rs"
 [[bin]]
 name = "crab_weighted_fuel_position"
 path = "day7/crab_weighted_fuel_position/main.rs"
+
+[[bin]]
+name = "segment_simple_nums"
+path = "day8/segment_simple_nums/main.rs"
