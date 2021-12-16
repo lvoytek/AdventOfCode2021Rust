@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "9.0.0"
+version = "9.1.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -77,3 +77,7 @@ path = "day8/segment_full_sum/main.rs"
 [[bin]]
 name = "smoke_local_mins"
 path = "day9/smoke_local_mins/main.rs"
+
+[[bin]]
+name = "smoke_basins"
+path = "day9/smoke_basins/main.rs"
