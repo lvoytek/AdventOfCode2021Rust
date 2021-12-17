@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "10.1.0"
+version = "11.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -89,3 +89,7 @@ path = "day10/wrong_character_parsing/main.rs"
 [[bin]]
 name = "character_completion"
 path = "day10/character_completion/main.rs"
+
+[[bin]]
+name = "octopus_flash_count"
+path = "day11/octopus_flash_count/main.rs"
