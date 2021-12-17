@@ -90,10 +90,10 @@ fn main() {
         octomap[current_vec_index].push(-1);
     }
 
-    let mut flash_count = 0;
+    let mut sync_timer = 0;
 
-    // Simulate 100 steps
-    for _ in 0..100 {
+    // Simulate until a sync happens
+    loop {
         // Increase all values by 1
         for i in 1..=height {
             for j in 1..=width {
@@ -104,10 +104,32 @@ fn main() {
         // Go through flashes
         for i in 1..=height {
             for j in 1..=width {
-                flash_count += get_flashes(i, j, &mut octomap);
+                get_flashes(i, j, &mut octomap);
             }
+        }
+
+        sync_timer += 1;
+
+        // Check if in sync
+        let mut in_sync = true;
+
+        for i in 1..=height {
+            for j in 1..=width {
+                if octomap[i][j] > 0 {
+                    in_sync = false;
+                    break;
+                }
+            }
+
+            if !in_sync {
+                break;
+            }
+        }
+
+        if in_sync {
+            break;
         }
     }
 
-    println!("Flash count: {}", flash_count);
+    println!("Steps to sync: {}", sync_timer);
 }
