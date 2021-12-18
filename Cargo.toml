@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "12.0.0"
+version = "12.1.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -101,3 +101,7 @@ path = "day11/octopus_flash_sync/main.rs"
 [[bin]]
 name = "path_count"
 path = "day12/path_count/main.rs"
+
+[[bin]]
+name = "path_count_repeat"
+path = "day12/path_count_repeat/main.rs"
