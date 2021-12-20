@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "12.1.0"
+version = "13.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -105,3 +105,7 @@ path = "day12/path_count/main.rs"
 [[bin]]
 name = "path_count_repeat"
 path = "day12/path_count_repeat/main.rs"
+
+[[bin]]
+name = "origami_first_fold"
+path = "day13/origami_first_fold/main.rs"
