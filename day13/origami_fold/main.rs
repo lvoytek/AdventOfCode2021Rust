@@ -79,8 +79,40 @@ fn main() {
                 }
             }
         }
-        break;
     }
 
-    println!("Number of points: {}", points.len());
+    // Find largest x and y then print grid based on that size
+    let mut largest_x = 0;
+    let mut largest_y = 0;
+
+    for point in &points {
+        if point.x > largest_x {
+            largest_x = point.x;
+        }
+
+        if point.y > largest_y {
+            largest_y = point.y;
+        }
+    }
+
+    for y in 0..=largest_y {
+        for x in 0..=largest_x {
+            let mut point_exists = false;
+
+            for point in &points {
+                if point.x == x && point.y == y {
+                    point_exists = true;
+                    break;
+                }
+            }
+
+            if point_exists {
+                print!("#");
+            }
+            else {
+                print!(" ");
+            }
+        }
+        println!("");
+    }
 }
