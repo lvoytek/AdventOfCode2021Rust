@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "15.0.0"
+version = "15.1.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -125,3 +125,7 @@ path = "day14/polymer_element_big_min_max/main.rs"
 [[bin]]
 name = "chiton_lowest_risk_path"
 path = "day15/chiton_lowest_risk_path/main.rs"
+
+[[bin]]
+name = "chiton_lowest_risk_big_path"
+path = "day15/chiton_lowest_risk_big_path/main.rs"

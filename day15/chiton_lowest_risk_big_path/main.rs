@@ -5,12 +5,25 @@ struct Pos {
     x: usize,
     y: usize,
     cumulative_score: u32,
+    heuristic_distance: u32,
 }
 
 impl PartialEq for Pos {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
     }
+}
+
+// Get an estimated distance to the end
+fn get_heuristic_distance(x: usize, y: usize, risk_map: &Vec<Vec<u32>>) -> u32 {
+    let final_x = risk_map[0].len() - 1;
+    let final_y = risk_map.len() - 1;
+
+    // Find basic manhattan distance to get heuristic
+    let x_remaining = (final_x - x) as u32;
+    let y_remaining = (final_y - y) as u32;
+
+    return x_remaining + y_remaining;
 }
 
 fn get_lowest_risk(risk_map: &Vec<Vec<u32>>) -> u32 {
@@ -25,6 +38,7 @@ fn get_lowest_risk(risk_map: &Vec<Vec<u32>>) -> u32 {
         x: 0,
         y: 0,
         cumulative_score: 0,
+        heuristic_distance: 0,
     });
 
     while open.len() > 0 {
@@ -32,7 +46,8 @@ fn get_lowest_risk(risk_map: &Vec<Vec<u32>>) -> u32 {
         let mut current_pos_index : usize = 0;
 
         for open_pos_index in 0..open.len() {
-            if open[open_pos_index].cumulative_score < open[current_pos_index].cumulative_score {
+            if open[open_pos_index].cumulative_score + open[open_pos_index].heuristic_distance <
+                open[current_pos_index].cumulative_score + open[current_pos_index].heuristic_distance {
                 current_pos_index = open_pos_index;
             }
         }
@@ -56,6 +71,7 @@ fn get_lowest_risk(risk_map: &Vec<Vec<u32>>) -> u32 {
                 x: current_pos.x - 1,
                 y: current_pos.y,
                 cumulative_score: current_pos.cumulative_score + risk_map[current_pos.y][current_pos.x - 1],
+                heuristic_distance: get_heuristic_distance(current_pos.x - 1, current_pos.y, risk_map),
             })
         }
 
@@ -64,6 +80,7 @@ fn get_lowest_risk(risk_map: &Vec<Vec<u32>>) -> u32 {
                 x: current_pos.x,
                 y: current_pos.y - 1,
                 cumulative_score: current_pos.cumulative_score + risk_map[current_pos.y - 1][current_pos.x],
+                heuristic_distance: get_heuristic_distance(current_pos.x, current_pos.y - 1, risk_map),
             })
         }
 
@@ -72,6 +89,7 @@ fn get_lowest_risk(risk_map: &Vec<Vec<u32>>) -> u32 {
                 x: current_pos.x + 1,
                 y: current_pos.y,
                 cumulative_score: current_pos.cumulative_score + risk_map[current_pos.y][current_pos.x + 1],
+                heuristic_distance: get_heuristic_distance(current_pos.x + 1, current_pos.y, risk_map),
             })
         }
 
@@ -80,6 +98,7 @@ fn get_lowest_risk(risk_map: &Vec<Vec<u32>>) -> u32 {
                 x: current_pos.x,
                 y: current_pos.y + 1,
                 cumulative_score: current_pos.cumulative_score + risk_map[current_pos.y + 1][current_pos.x],
+                heuristic_distance: get_heuristic_distance(current_pos.x, current_pos.y + 1, risk_map),
             })
         }
 
@@ -142,7 +161,44 @@ fn main() {
         }
     }
 
-    // Run Dijkstra's to find path with lowest risk
-    println!("Lowest Risk: {}", get_lowest_risk(&risk_map));
+    // Increase map size to 5x with +1 risk values going down and right (capped at 9)
+    // Start with top row of chunks
+    let risk_map_start_width = risk_map[0].len();
+    let risk_map_start_height = risk_map.len();
 
+    for i in 1..=4 {
+        for y in 0..risk_map_start_height {
+            for x in 0..risk_map_start_width {
+                let mut num_to_add = risk_map[y][x] + i;
+
+                if num_to_add > 9 {
+                    num_to_add -= 9;
+                }
+
+                risk_map[y].push(num_to_add);
+            }
+        }
+    }
+
+    // Add remaining chunks based on top row
+    let risk_map_new_width = risk_map[0].len();
+    for i in 1..=4 {
+        for y in 0..risk_map_start_height {
+            risk_map.push(Vec::<u32>::new());
+            let current_vec_index = (risk_map.len() - 1) as usize;
+
+            for x in 0..risk_map_new_width {
+                let mut num_to_add = risk_map[y][x] + i;
+
+                if num_to_add > 9 {
+                    num_to_add -= 9;
+                }
+
+                risk_map[current_vec_index].push(num_to_add);
+            }
+        }
+    }
+
+    // Run A* to find path with lowest risk
+    println!("Lowest Risk: {}", get_lowest_risk(&risk_map));
 }
