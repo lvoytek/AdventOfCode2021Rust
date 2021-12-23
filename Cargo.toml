@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "14.0.0"
+version = "14.1.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -117,3 +117,7 @@ path = "day13/origami_fold/main.rs"
 [[bin]]
 name = "polymer_element_min_max"
 path = "day14/polymer_element_min_max/main.rs"
+
+[[bin]]
+name = "polymer_element_big_min_max"
+path = "day14/polymer_element_big_min_max/main.rs"
