@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "16.1.0"
+version = "17.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -137,3 +137,7 @@ path = "day16/packet_version_addition/main.rs"
 [[bin]]
 name = "packet_solve"
 path = "day16/packet_solve/main.rs"
+
+[[bin]]
+name = "probe_launch_height"
+path = "day17/probe_launch_height/main.rs"
