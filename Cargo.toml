@@ -147,5 +147,13 @@ name = "probe_on_target"
 path = "day17/probe_on_target/main.rs"
 
 [[bin]]
+name = "snailfish_magnitude"
+path = "day18/snailfish_magnitude/main.rs"
+
+[[bin]]
+name = "alu_largest_model_number"
+path = "day24/alu_largest_model_number/main.rs"
+
+[[bin]]
 name = "cucumber_stop"
 path = "day25/cucumber_stop/main.rs"
