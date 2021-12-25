@@ -1,6 +1,6 @@
 [package]
 name = "lvoytek_advent_of_code_2021"
-version = "17.1.0"
+version = "25.0.0"
 authors = ["Lena Voytek"]
 edition = "2021"
 
@@ -145,3 +145,7 @@ path = "day17/probe_launch_height/main.rs"
 [[bin]]
 name = "probe_on_target"
 path = "day17/probe_on_target/main.rs"
+
+[[bin]]
+name = "cucumber_stop"
+path = "day25/cucumber_stop/main.rs"
