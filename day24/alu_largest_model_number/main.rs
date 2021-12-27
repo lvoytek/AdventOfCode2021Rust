@@ -1,4 +1,5 @@
 use std::fs;
+use std::cmp::Ordering;
 
 #[derive(PartialEq)]
 enum OpType {
@@ -31,6 +32,91 @@ struct Operation {
 
     // The current head node index for a variable's calculation (Var only)
     top: usize,
+}
+
+#[derive(Clone, Copy, Eq)]
+struct SolutionDigit {
+    used: bool,
+    value: u8,
+}
+
+impl PartialOrd for SolutionDigit {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for SolutionDigit {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.used && other.used {
+            return self.value.cmp(&other.value);
+        }
+        else if !self.used && !other.used {
+            return Ordering::Equal;
+        }
+        else if self.used {
+            return Ordering::Less;
+        }
+        else {
+            return Ordering::Greater;
+        }
+    }
+}
+
+impl PartialEq for SolutionDigit {
+    fn eq(&self, other: &Self) -> bool {
+        self.used && other.used && self.value == other.value
+    }
+}
+
+#[derive(Clone, Copy, Eq)]
+struct Solution {
+    result: i64,
+    digits: [SolutionDigit; 14],
+}
+
+impl PartialOrd for Solution {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Solution {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.result == other.result {
+            for i in 0..14 {
+                if self.digits[i] != other.digits[i] {
+                    if self.digits[i].used && other.digits[i].used {
+                        return self.digits[i].cmp(&other.digits[i]);
+                    }
+                    else if self.digits[i].used || other.digits[i].used {
+                        return Ordering::Equal;
+                    }
+                }
+            }
+
+            return Ordering::Equal;
+        }
+        else {
+            return self.result.cmp(&other.result);
+        }
+    }
+}
+
+impl PartialEq for Solution {
+    fn eq(&self, other: &Self) -> bool {
+        if self.result == other.result {
+            for i in 0..14 {
+                if self.digits[i] != other.digits[i] {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
 
 fn get_operation_index_of(arg: char, vars: &Vec<Operation>) -> usize {
@@ -330,6 +416,7 @@ fn alu_inst(instruction: &str, digit_num: usize, vars: &mut Vec<Operation>) -> u
     return digit_num;
 }
 
+#[allow(dead_code)]
 fn alu_print(index: usize, vars: &Vec<Operation>) {
     match vars[index].op_type {
         OpType::Const => print!("{}", vars[index].val),
@@ -347,48 +434,168 @@ fn alu_print(index: usize, vars: &Vec<Operation>) {
     }
 }
 
-fn alu_rev_solve(results: &Vec<i64>, index: usize, digits: &mut [u8; 14], vars: &Vec<Operation>) -> i64 {
+fn create_empty_solution(result: i64) -> Solution {
+    return Solution {
+        result: result,
+        digits: [SolutionDigit {
+                used: false,
+                value: 0,
+        }; 14],
+    };
+}
+
+// If combination of two solutions succeeds return it and true otherwise false
+fn combine_solutions(result: i64, solution_a: &Solution, solution_b: &Solution) -> (Solution, bool) {
+    let mut new_solution = create_empty_solution(result);
+
+    for i in 0..14 {
+        if solution_a.digits[i].used && solution_b.digits[i].used {
+            if solution_a.digits[i].value == solution_b.digits[i].value {
+                new_solution.digits[i].used = true;
+                new_solution.digits[i].value = solution_a.digits[i].value;
+            }
+            else {
+                return (new_solution, false);
+            }
+        }
+        else if solution_a.digits[i].used {
+            new_solution.digits[i].used = true;
+            new_solution.digits[i].value = solution_a.digits[i].value;
+        }
+        else if solution_b.digits[i].used {
+            new_solution.digits[i].used = true;
+            new_solution.digits[i].value = solution_b.digits[i].value;
+        }
+    }
+
+    return (new_solution, true);
+}
+
+// Keep top solutions per output value
+fn trim_solutions(solutions: &mut Vec<Solution>) {
+    for i in (0..solutions.len()).rev() {
+        let mut add_solution = true;
+
+        for j in 0..solutions.len() {
+            if j != i && solutions[j].result == solutions[i].result && solutions[i] < solutions[j] {
+                add_solution = false;
+                break;
+            }
+        }
+
+        if !add_solution {
+            solutions.remove(i);
+        }
+    }
+}
+
+fn alu_any_solve(index: usize, vars: &Vec<Operation>) -> Vec<Solution> {
     match vars[index].op_type {
-        OpType::Var | OpType::Const => {return vars[index].val},
+        OpType::Var | OpType::Const => {
+            return vec![create_empty_solution(vars[index].val); 1];
+        },
         OpType::Add => {
+            let rhs_solutions = alu_any_solve(vars[index].arg_b_index, vars);
+            let lhs_solutions = alu_any_solve(vars[index].arg_a_index, vars);
+            let mut full_solutions = Vec::<Solution>::new();
 
-            let rhs = alu_solve(vars[index].arg_b_index, digits, vars);
-            let mut lhs_results = Vec::<i64>::new();
-            for i in 0..results.len() {
-                lhs_results.push(results[i] - rhs);
-            }
+            for rhs_solution in &rhs_solutions {
+                for lhs_solution in &lhs_solutions {
+                    let (new_solution, success) = combine_solutions(lhs_solution.result + rhs_solution.result, lhs_solution, rhs_solution);
 
-            return alu_rev_solve(&lhs_results, vars[index].arg_a_index, digits, vars) + rhs;
-        },
-        OpType::Mul => {
-
-            let rhs = alu_solve(vars[index].arg_b_index, digits, vars);
-            let mut lhs_results = Vec::<i64>::new();
-            for i in 0..results.len() {
-                lhs_results.push(results[i] / rhs);
-            }
-
-            return alu_rev_solve(&lhs_results, vars[index].arg_a_index, digits, vars) / rhs;
-        },
-        OpType::Div => return alu_solve(vars[index].arg_a_index, digits, vars) / alu_solve(vars[index].arg_b_index, digits, vars),
-        OpType::Mod => return alu_solve(vars[index].arg_a_index, digits, vars) % alu_solve(vars[index].arg_b_index, digits, vars),
-        OpType::Eql => return if alu_solve(vars[index].arg_a_index, digits, vars) == alu_solve(vars[index].arg_b_index, digits, vars) {1} else {0},
-        OpType::Inp => {
-            // Find max result within range [1,9]
-            let mut max_result = 0;
-            for i in 0..results.len() {
-                if results[i] < 10 && results[i] > max_result {
-                    max_result = results[i];
+                    if success {
+                        full_solutions.push(new_solution);
+                    }
                 }
             }
 
-            if max_result < 1 {
-                println!("Error: no digit result found for d{}", vars[index].input_digit);
+            trim_solutions(&mut full_solutions);
+            return full_solutions;
+        }
+        OpType::Mul => {
+            let rhs_solutions = alu_any_solve(vars[index].arg_b_index, vars);
+            let lhs_solutions = alu_any_solve(vars[index].arg_a_index, vars);
+            let mut full_solutions = Vec::<Solution>::new();
+
+            for rhs_solution in &rhs_solutions {
+                for lhs_solution in &lhs_solutions {
+                    let (new_solution, success) = combine_solutions(lhs_solution.result * rhs_solution.result, lhs_solution, rhs_solution);
+
+                    if success {
+                        full_solutions.push(new_solution);
+                    }
+                }
             }
 
-            digits[vars[index].input_digit] = max_result as u8;
+            trim_solutions(&mut full_solutions);
+            return full_solutions;
+        },
+        OpType::Div => {
+            let rhs_solutions = alu_any_solve(vars[index].arg_b_index, vars);
+            let lhs_solutions = alu_any_solve(vars[index].arg_a_index, vars);
+            let mut full_solutions = Vec::<Solution>::new();
 
-            return max_result;
+            for rhs_solution in &rhs_solutions {
+                for lhs_solution in &lhs_solutions {
+                    let (new_solution, success) = combine_solutions(lhs_solution.result / rhs_solution.result, lhs_solution, rhs_solution);
+
+                    if success {
+                        full_solutions.push(new_solution);
+                    }
+                }
+            }
+
+            trim_solutions(&mut full_solutions);
+            return full_solutions;
+        },
+        OpType::Mod => {
+            let rhs_solutions = alu_any_solve(vars[index].arg_b_index, vars);
+            let lhs_solutions = alu_any_solve(vars[index].arg_a_index, vars);
+            let mut full_solutions = Vec::<Solution>::new();
+
+            for rhs_solution in &rhs_solutions {
+                for lhs_solution in &lhs_solutions {
+                    let (new_solution, success) = combine_solutions(lhs_solution.result % rhs_solution.result, lhs_solution, rhs_solution);
+
+                    if success {
+                        full_solutions.push(new_solution);
+                    }
+                }
+            }
+
+            trim_solutions(&mut full_solutions);
+            return full_solutions;
+        },
+        OpType::Eql => {
+            let rhs_solutions = alu_any_solve(vars[index].arg_b_index, vars);
+            let lhs_solutions = alu_any_solve(vars[index].arg_a_index, vars);
+            let mut full_solutions = Vec::<Solution>::new();
+
+            for rhs_solution in &rhs_solutions {
+                for lhs_solution in &lhs_solutions {
+                    let (new_solution, success) = combine_solutions(if lhs_solution.result == rhs_solution.result {1} else {0}, lhs_solution, rhs_solution);
+
+                    if success {
+                        full_solutions.push(new_solution);
+                    }
+                }
+            }
+
+            trim_solutions(&mut full_solutions);
+            return full_solutions;
+        },
+        OpType::Inp => {
+            let mut solution_vec = Vec::<Solution>::new();
+
+            // Use all digit vals 1-9
+            for i in 1..=9 {
+                let mut new_solution = create_empty_solution(i);
+                new_solution.digits[vars[index].input_digit].used = true;
+                new_solution.digits[vars[index].input_digit].value = i as u8;
+                solution_vec.push(new_solution);
+            }
+
+            return solution_vec;
         },
     }
 }
@@ -406,7 +613,7 @@ fn alu_solve(index: usize, digits: &[u8; 14], vars: &Vec<Operation>) -> i64 {
 }
 
 fn main() {
-    let input_contents = fs::read_to_string("files/small_monad_input")
+    let input_contents = fs::read_to_string("files/monad_input")
         .expect("Unable to read from input");
 
     let lines = input_contents.lines().collect::<Vec<&str>>();
@@ -471,12 +678,34 @@ fn main() {
         current_digit = alu_inst(line, current_digit, &mut vars);
     }
 
+    //alu_print(vars[3].top, &vars);
+    let solutions = alu_any_solve(vars[3].top, &vars);
+    println!("{}", solutions.len());
+
+    for i in 0..solutions.len() {
+        print!("{} ", solutions[i].result);
+    }
+    println!("");
+
+    // Find zero solution
+    let mut largest_zero_index: usize = 0;
+
+    for i in 0..solutions.len() {
+        if solutions[i].result == 0 {
+            largest_zero_index = i;
+            break;
+        }
+    }
+
+    // Extract digits
     let mut digits : [u8; 14] = [9; 14];
 
-    let possible_results: Vec<i64> = vec![0; 1];
+    for i in 0..14 {
+        if solutions[largest_zero_index].digits[i].used {
+            digits[i] = solutions[largest_zero_index].digits[i].value;
+        }
+    }
 
-    alu_print(vars[3].top, &vars);
-    alu_rev_solve(&possible_results, vars[3].top, &mut digits, &vars);
     assert_eq!(0, alu_solve(vars[3].top, &digits, &vars));
 
     for i in 0..14 {
